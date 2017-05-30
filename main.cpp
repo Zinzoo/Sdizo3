@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
-//#include <windows.h>
 #include <math.h>
 #include <string>
 #include <iomanip>
@@ -14,7 +13,7 @@ const int MAXINT = 2147483647;
 
 
 int n, m, v0, d, dh, sptr, shptr, wybor;
-int limit, n, maxWartosc = 0;
+int limit, maxWartosc = 0;
 bool **A;                   
 int **W;                   
 int *S, *Sh;                     
@@ -87,33 +86,76 @@ void TSP(int v)
 int main()
 {
 	int i, j, x, y, z;
-	int *waga, *wartosc, i, j, wartoscPlecaka = 0, wagaPlecaka = 0;
+	int *waga, *wartosc, wartoscPlecaka = 0, wagaPlecaka = 0;
 	double *stosunek;
 	bool *wynik, *rzecz;
 
+
 	while (poczatek)
 	{
-		cout << "Stworz graf" << endl << "1. Wczytaj z pliku" << endl << "2. Wprowadz recznie" << endl;
+		cout << "Wybierz problem" << endl << "1. Problem komiwojazera" << endl << "2. Problem plecakowy" << endl;
 		cin >> wybor;
 		system("cls");
 		switch (wybor)
 		{
 		case 1:
 		{
-			string nazwa;
-			cout << "Podaj nazwe pliku" << endl;
-			cin >> nazwa;
-			nazwa = nazwa + ".txt";
-			ifstream plik(nazwa);
-			if (!plik)
+			cout << "Stworz graf" << endl << "1. Wczytaj z pliku" << endl << "2. Wprowadz recznie" << endl;
+			cin >> wybor;
+			system("cls");
+			switch (wybor)
 			{
-				cout << "Nie mozna otworzyc pliku" << endl;
-				poczatek = true;
-			}
+			case 1:
+			{
+				string nazwa;
+				cout << "Podaj nazwe pliku" << endl;
+				cin >> nazwa;
+				nazwa = nazwa + ".txt";
+				ifstream plik(nazwa);
+				if (!plik)
+				{
+					cout << "Nie mozna otworzyc pliku" << endl;
+					poczatek = true;
+				}
 
-			else
+				else
+				{
+					plik >> n >> m;
+
+					S = new int[n];
+					Sh = new int[n];
+					visited = new bool[n];
+					A = new bool *[n];
+					W = new int *[n];
+					for (i = 0; i < n; i++)
+					{
+						A[i] = new bool[n];
+						W[i] = new int[n];
+						for (j = 0; j < n; j++)
+						{
+							A[i][j] = false;
+							W[i][j] = 0;
+						}
+						visited[i] = false;
+					}
+					sptr = shptr = 0;
+
+					for (i = 0; i < m; i++)
+					{
+						plik >> x >> y >> z;
+						A[x][y] = A[y][x] = true;
+						W[x][y] = W[y][x] = z;
+					}
+
+					cout << endl;
+				}
+			}break;
+
+			case 2:
 			{
-				plik >> n >> m;
+				cout << "Podaj liczbe wierzcholkow oraz krawedzi" << endl;
+
+				cin >> n >> m;
 
 				S = new int[n];
 				Sh = new int[n];
@@ -133,206 +175,213 @@ int main()
 				}
 				sptr = shptr = 0;
 
+				cout << "Podaj wagi krawedzi" << endl;
+
 				for (i = 0; i < m; i++)
 				{
-					plik >> x >> y >> z;
+					cin >> x >> y >> z;
 					A[x][y] = A[y][x] = true;
 					W[x][y] = W[y][x] = z;
 				}
 
 				cout << endl;
+			}break;
 			}
-		}break;
 
-		case 2:
-		{
-			cout << "Podaj liczbe wierzcholkow oraz krawedzi" << endl;
-
-			cin >> n >> m;
-
-			S = new int[n];
-			Sh = new int[n];
-			visited = new bool[n];
-			A = new bool *[n];
-			W = new int *[n];
-			for (i = 0; i < n; i++)
+			d = MAXINT;
+			dh = v0 = 0;
+			TSP(v0);
+			if (sptr)
 			{
-				A[i] = new bool[n];
-				W[i] = new int[n];
-				for (j = 0; j < n; j++)
-				{
-					A[i][j] = false;
-					W[i][j] = 0;
-				}
-				visited[i] = false;
+				for (i = 0; i < sptr; i++) cout << S[i] << " ";
+				cout << v0 << endl;
+				cout << "d = " << d << endl;
 			}
-			sptr = shptr = 0;
-
-			cout << "Podaj wagi krawedzi" << endl;
-
-			for (i = 0; i < m; i++)
-			{
-				cin >> x >> y >> z;
-				A[x][y] = A[y][x] = true;
-				W[x][y] = W[y][x] = z;
-			}
+			else cout << "NO HAMILTONIAN CYCLE" << endl;
 
 			cout << endl;
+
+
+
+			delete[] S;
+			delete[] Sh;
+			delete[] visited;
+
+			for (i = 0; i < n; i++)
+			{
+				delete[] A[i];
+				delete[] W[i];
+			}
+
+			delete[] A;
+			delete[] W;
+
+			return 0;
+		}break;
+		case 2:
+		{
+			cout << "Stworz plecak" << endl << "1. Wczytaj z pliku" << endl << "2. Wprowadz recznie" << endl;
+			cin >> wybor;
+			system("cls");
+			switch (wybor)
+			{
+			case 1:
+			{
+				string nazwa;
+				cout << "Podaj nazwe pliku" << endl;
+				cin >> nazwa;
+				nazwa = nazwa + ".txt";
+				ifstream plik(nazwa);
+				if (!plik)
+				{
+					cout << "Nie mozna otworzyc pliku" << endl;
+					poczatek = true;
+				}
+
+				else
+				{
+					plik >> limit >> n;
+
+					waga = new int[n];                //wagi przedmiotow
+					wartosc = new int[n];             //wartosci przedmiotow
+					stosunek = new double[n];         //do posortowania
+					wynik = new bool[n];              //do zapisania wynikow
+					rzecz = new bool[n];              //do zapamietania obecnych elementow
+
+					for (i = 0; i < n; i++)
+					{
+						plik >> waga[i] >> wartosc[i];
+
+						if (waga[i] > limit)      //jezeli waga przedmiotu przekracza limit
+						{
+							i--;  //nie uwzgledniaj go
+							n--;
+						}
+						else
+							stosunek[i] = (double)wartosc[i] / waga[i];
+					}
+
+					for (i = 0; i < n - 1; i++)
+					{
+						for (j = 0; j < n - i - 1; j++)
+						{
+							if (stosunek[j] < stosunek[j + 1])
+							{
+								swap(stosunek[j], stosunek[j + 1]);
+								swap(waga[j], waga[j + 1]);
+								swap(wartosc[j], wartosc[j + 1]);
+							}
+						}
+					}
+
+					delete(stosunek);
+
+					/* Wywolanie wlasciwego algorytmu */
+
+					Pakuj(0, waga, wartosc, rzecz, wynik, 0, 0);
+
+					delete(rzecz);
+
+					/* Wypisanie wynikow */
+
+					cout << endl << endl << "\tRzeczy w plecaku: " << endl;
+					for (i = 0; i < n; i++)
+						if (wynik[i])
+						{
+							wagaPlecaka += waga[i];
+							wartoscPlecaka += wartosc[i];
+							cout << "\tPrzedmiot o wadze " << waga[i];
+							cout << " i o wartosci " << wartosc[i] << "." << endl;
+						}
+					cout << endl << "\tWaga plecaka: " << wagaPlecaka << endl;
+					cout << "\tWartosc plecaka: " << wartoscPlecaka << "\n\n\t";
+
+					delete(waga);
+					delete(wartosc);
+					delete(wynik);
+
+					system("pause");
+
+				}
+			}break;
+
+			case 2:
+			{
+				cout << endl << endl << "\tPodaj limit plecaka: ";
+				cin >> limit;
+				cout << "\tPodaj ilosc przedmiotow: ";
+				cin >> n;
+				cout << "\n\n";
+
+				waga = new int[n];                //wagi przedmiotow
+				wartosc = new int[n];             //wartosci przedmiotow
+				stosunek = new double[n];         //do posortowania
+				wynik = new bool[n];              //do zapisania wynikow
+				rzecz = new bool[n];              //do zapamietania obecnych elementow
+
+				for (i = 0; i<n; i++)
+				{
+					cout << "\tPodaj wage przedmiotu " << i << " : ";
+					cin >> waga[i];
+					cout << "\tPodaj wartosc przedmiotu: ";
+					cin >> wartosc[i];
+					cout << "\n\n";
+					if (waga[i]>limit)      //jezeli waga przedmiotu przekracza limit
+					{
+						i--;  //nie uwzgledniaj go
+						n--;
+					}
+					else
+						stosunek[i] = (double)wartosc[i] / waga[i];
+				}
+
+				/* Posortowanie danych malejaco wzgledem stosunku wartosci do wagi */
+				/* Sortowanie babelkowe */
+
+				for (i = 0; i<n - 1; i++)
+				{
+					for (j = 0; j<n - i - 1; j++)
+					{
+						if (stosunek[j]<stosunek[j + 1])
+						{
+							swap(stosunek[j], stosunek[j + 1]);
+							swap(waga[j], waga[j + 1]);
+							swap(wartosc[j], wartosc[j + 1]);
+						}
+					}
+				}
+
+				delete(stosunek);
+
+				/* Wywolanie wlasciwego algorytmu */
+
+				Pakuj(0, waga, wartosc, rzecz, wynik, 0, 0);
+
+				delete(rzecz);
+
+				/* Wypisanie wynikow */
+
+				cout << endl << endl << "\tRzeczy w plecaku: " << endl;
+				for (i = 0; i<n; i++)
+					if (wynik[i])
+					{
+						wagaPlecaka += waga[i];
+						wartoscPlecaka += wartosc[i];
+						cout << "\tPrzedmiot o wadze " << waga[i];
+						cout << " i o wartosci " << wartosc[i] << "." << endl;
+					}
+				cout << endl << "\tWaga plecaka: " << wagaPlecaka << endl;
+				cout << "\tWartosc plecaka: " << wartoscPlecaka << "\n\n\t";
+
+				delete(waga);
+				delete(wartosc);
+				delete(wynik);
+
+				system("pause");
+			}break;
+			}
+			
 		}break;
 		}
-
-		d = MAXINT;
-		dh = v0 = 0;
-		TSP(v0);
-		if (sptr)
-		{
-			for (i = 0; i < sptr; i++) cout << S[i] << " ";
-			cout << v0 << endl;
-			cout << "d = " << d << endl;
-		}
-		else cout << "NO HAMILTONIAN CYCLE" << endl;
-
-		cout << endl;
-
-
-
-		delete[] S;
-		delete[] Sh;
-		delete[] visited;
-
-		for (i = 0; i < n; i++)
-		{
-			delete[] A[i];
-			delete[] W[i];
-		}
-
-		delete[] A;
-		delete[] W;
-
-		return 0;
 	}
 }
-
-
-/*
-Name: Dyskretny problem plecakowy - algorytm z nawrotami
-Date:17-04-09 21:59
-Description:
-Naszym zadaniem jest nabrac do plecaka przedmiotow tak,
-zeby ich wartosc byla jak najwieksza,
-Rozwiazanie algorytmem przeszukiwania z nawrotami (backtracking).
-*/
-
-#include <iostream>
-using namespace std;
-
-int limit, n, maxWartosc = 0;
-void Pakuj(int i, int *waga, int *wartosc, bool *rzecz, bool *wynik,
-	int obecnaWartosc, int obecnaWaga)
-{
-	if (i == n)                               //jezeli jestesmy na jednym z koncow
-	{
-		if (obecnaWartosc>maxWartosc)   //porownaj wartosc plecaka 
-		{
-			maxWartosc = obecnaWartosc;
-			for (int j = 0; j<n; j++)
-				wynik[j] = rzecz[j];
-		}
-	}
-	else
-	{
-		if (obecnaWaga + waga[i] <= limit)     //sprawdz czy element sie zmiesci
-		{
-			rzecz[i] = 1;             //dodaj go i sprawdzaj dalej
-			obecnaWaga += waga[i];
-			obecnaWartosc += wartosc[i];
-			Pakuj(i + 1, waga, wartosc, rzecz, wynik, obecnaWartosc, obecnaWaga);
-			rzecz[i] = 0;             //odejmij go i sprawdz inne mozliwosci
-			obecnaWaga -= waga[i];
-			obecnaWartosc -= wartosc[i];
-		}
-		Pakuj(i + 1, waga, wartosc, rzecz, wynik, obecnaWartosc, obecnaWaga);  //idz dalej
-	}
-}
-
-int main()
-{
-	int *waga, *wartosc, i, j, wartoscPlecaka = 0, wagaPlecaka = 0;
-	double *stosunek;
-	bool *wynik, *rzecz;
-
-	/* Wprowadzenie danych */
-
-	cout << endl << endl << "\tPodaj limit plecaka: ";
-	cin >> limit;
-	cout << "\tPodaj ilosc przedmiotow: ";
-	cin >> n;
-	cout << "\n\n";
-
-	waga = new int[n];                //wagi przedmiotow
-	wartosc = new int[n];             //wartosci przedmiotow
-	stosunek = new double[n];         //do posortowania
-	wynik = new bool[n];              //do zapisania wynikow
-	rzecz = new bool[n];              //do zapamietania obecnych elementow
-
-	for (i = 0; i<n; i++)
-	{
-		cout << "\tPodaj wage przedmiotu " << i << " : ";
-		cin >> waga[i];
-		cout << "\tPodaj wartosc przedmiotu: ";
-		cin >> wartosc[i];
-		cout << "\n\n";
-		if (waga[i]>limit)      //jezeli waga przedmiotu przekracza limit
-		{
-			i--;  //nie uwzgledniaj go
-			n--;
-		}
-		else
-			stosunek[i] = (double)wartosc[i] / waga[i];
-	}
-
-	/* Posortowanie danych malejaco wzgledem stosunku wartosci do wagi */
-	/* Sortowanie babelkowe */
-
-	for (i = 0; i<n - 1; i++)
-	{
-		for (j = 0; j<n - i - 1; j++)
-		{
-			if (stosunek[j]<stosunek[j + 1])
-			{
-				swap(stosunek[j], stosunek[j + 1]);
-				swap(waga[j], waga[j + 1]);
-				swap(wartosc[j], wartosc[j + 1]);
-			}
-		}
-	}
-
-	delete(stosunek);
-
-	/* Wywolanie wlasciwego algorytmu */
-
-	Pakuj(0, waga, wartosc, rzecz, wynik, 0, 0);
-
-	delete(rzecz);
-
-	/* Wypisanie wynikow */
-
-	cout << endl << endl << "\tRzeczy w plecaku: " << endl;
-	for (i = 0; i<n; i++)
-		if (wynik[i])
-		{
-			wagaPlecaka += waga[i];
-			wartoscPlecaka += wartosc[i];
-			cout << "\tPrzedmiot o wadze " << waga[i];
-			cout << " i o wartosci " << wartosc[i] << "." << endl;
-		}
-	cout << endl << "\tWaga plecaka: " << wagaPlecaka << endl;
-	cout << "\tWartosc plecaka: " << wartoscPlecaka << "\n\n\t";
-
-	delete(waga);
-	delete(wartosc);
-	delete(wynik);
-
-	system("pause");
-}
-
