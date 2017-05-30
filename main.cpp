@@ -7,9 +7,12 @@
 #include <iomanip>
 #include <queue>
 #include <vector>
+#include <Windows.h>
 using namespace std;
 
-const int MAXINT = 2147483647;
+//const int MAXINT = 2147483647;
+double PCFreq = 0.0;
+__int64 licznik = 0;
 
 
 int n, m, v0, d, dh, sptr, shptr, wybor;
@@ -208,7 +211,7 @@ int main()
 			}break;
 			}
 
-			d = MAXINT;
+			d = 2147483647;
 			dh = v0 = 0;
 			czasStart();
 			TSP(v0);
@@ -238,7 +241,7 @@ int main()
 			delete[] A;
 			delete[] W;
 
-			return 0;
+			system("pause");
 		}break;
 		case 2:
 		{
