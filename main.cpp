@@ -20,6 +20,26 @@ int *S, *Sh;
 bool *visited;
 bool poczatek = true;
 
+void czasStart()
+{
+	LARGE_INTEGER li;
+	if (!QueryPerformanceFrequency(&li))
+		cout << "B³¹d!\n";
+
+	PCFreq = double(li.QuadPart) / 1000.0;
+
+	QueryPerformanceCounter(&li);
+	licznik = li.QuadPart;
+}
+
+void pobierzCzas()
+{
+	LARGE_INTEGER li;
+	QueryPerformanceCounter(&li);
+	cout << endl;
+	cout << "Operacja zajela: " << (li.QuadPart - licznik) / PCFreq << " milisekund" << endl;
+	licznik = 0;
+}
 							
 void Pakuj(int i, int *waga, int *wartosc, bool *rzecz, bool *wynik,
 	int obecnaWartosc, int obecnaWaga)
@@ -190,7 +210,9 @@ int main()
 
 			d = MAXINT;
 			dh = v0 = 0;
+			czasStart();
 			TSP(v0);
+			pobierzCzas();
 			if (sptr)
 			{
 				for (i = 0; i < sptr; i++) cout << S[i] << " ";
@@ -277,9 +299,9 @@ int main()
 					delete(stosunek);
 
 					/* Wywolanie wlasciwego algorytmu */
-
+					czasStart();
 					Pakuj(0, waga, wartosc, rzecz, wynik, 0, 0);
-
+					pobierzCzas();
 					delete(rzecz);
 
 					/* Wypisanie wynikow */
@@ -354,9 +376,9 @@ int main()
 				delete(stosunek);
 
 				/* Wywolanie wlasciwego algorytmu */
-
+				czasStart();
 				Pakuj(0, waga, wartosc, rzecz, wynik, 0, 0);
-
+				pobierzCzas();
 				delete(rzecz);
 
 				/* Wypisanie wynikow */
